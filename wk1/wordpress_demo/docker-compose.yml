@@ -1,0 +1,69 @@
+# services:
+#   db:
+#     image: mariadb:latest
+#     command: '--default-authentication-plugin=mysql_native_password'
+#     volumes:
+#       - ./var:/var/lib/mysql
+#     restart: always
+#     environment:
+#       MYSQL_ROOT_PASSWORD: somewordpress
+#       MYSQL_DATABASE: wordpress
+#       MYSQL_USER: wordpress
+#       MYSQL_PASSWORD: wordpress
+#     ports:
+#       - "3306:3306"
+#     networks:
+#       - asl
+
+#   wordpress:
+#     image: wordpress:latest
+#     volumes:
+#       - ./src:/var/www/html
+#     ports:
+#       - "8080:80"
+#     restart: always
+#     environment:
+#       WORDPRESS_DB_HOST: db
+#       WORDPRESS_DB_USER: wordpress
+#       WORDPRESS_DB_PASSWORD: wordpress
+#       WORDPRESS_DB_NAME: wordpress
+#     networks:
+#       - asl
+
+# networks:
+#   asl:
+
+services:
+  db:
+    image: mariadb:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: somewordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - asl
+
+  wordpress:
+    image: wordpress:latest
+    restart: always
+    depends_on:
+      - db
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    ports:
+      - "8080:80"
+    networks:
+      - asl
+
+networks:
+  asl:
+
+volumes:
+  db_data:
