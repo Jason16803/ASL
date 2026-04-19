@@ -5,70 +5,130 @@ const {
   filterContacts
 } = require("@jworkman-fs/asl");
 
+// Safest starting point: use package-provided contacts if available.
 let contacts = ContactModel.getContacts
   ? ContactModel.getContacts()
   : ContactModel.contacts || [];
+
+/**
+ * Maps library exceptions to HTTP responses.
+ */
+const handleError = (res, error) => {
+  switch (error?.name) {
+    case "InvalidContactError":
+    case "InvalidContactFieldError":
+    case "InvalidContactSchemaError":
+    case "InvalidEnumError":
+      return res.status(400).json({ message: error.message });
+
+    case "ContactNotFoundError":
+      return res.status(404).json({ message: error.message });
+
+    case "DuplicateContactResourceError":
+      return res.status(409).json({ message: error.message });
+
+    case "PagerOutOfRangeError":
+      return res.status(404).json({ message: error.message });
+
+    case "PagerLimitExceededError":
+      return res.status(400).json({ message: error.message });
+
+    default:
+      return res.status(500).json({ message: error.message || "Internal Server Error" });
+  }
+};
 
 const getAllContacts = (req, res) => {
   try {
     let results = [...contacts];
 
-    if (Object.keys(req.query).length > 0) {
-      try {
-        results = filterContacts(results, req.query);
-      } catch (err) {}
+    // 1) FILTERING via headers, not query params
+    const filterBy = req.get("X-Filter-By");
+    const filterOperator = req.get("X-Filter-Operator");
+    const filterValue = req.get("X-Filter-Value");
+
+    if (filterBy || filterOperator || filterValue) {
+      results = filterContacts(results, filterBy, filterOperator, filterValue);
     }
 
-    if (req.query.sort) {
-      try {
-        results = sortContacts(results, req.query.sort);
-      } catch (err) {}
+    // 2) SORTING via query params
+    if (req.query.sort || req.query.direction) {
+      results = sortContacts(results, req.query.sort, req.query.direction);
     }
 
-    if (req.query.page || req.query.limit) {
-      try {
-        const pager = new Pager(results, req.query.page, req.query.limit);
-        results = pager.getPagedData ? pager.getPagedData() : results;
-      } catch (err) {}
-    }
+    // 3) PAGINATION via query params
+    const page = req.query.page || 1;
+    const size = req.query.size || 10;
 
-    return res.status(200).json(results);
+    const pager = new Pager(results, page, size);
+
+    res.set("X-Page-Total", String(pager.total()));
+    res.set("X-Page-Next", String(pager.next()));
+    res.set("X-Page-Prev", String(pager.prev()));
+
+    return res.status(200).json(pager.results());
   } catch (error) {
-    return res.status(500).json({ error: "Failed to fetch contacts." });
+    return handleError(res, error);
   }
 };
 
 const getContactById = (req, res) => {
   try {
     const id = Number(req.params.id);
+
+    // Try model method first if it exists
+    if (typeof ContactModel.findById === "function") {
+      const contact = ContactModel.findById(id);
+      return res.status(200).json(contact);
+    }
+
     const contact = contacts.find((c) => Number(c.id) === id);
 
     if (!contact) {
-      return res.status(404).json({ error: "Contact not found." });
+      const err = new Error(`Contact with id ${id} not found.`);
+      err.name = "ContactNotFoundError";
+      throw err;
     }
 
     return res.status(200).json(contact);
   } catch (error) {
-    return res.status(500).json({ error: "Failed to fetch contact." });
+    return handleError(res, error);
   }
 };
 
 const createContact = (req, res) => {
   try {
-    const { firstName, lastName, email, phone, birthday } = req.body;
+    // Prefer library model create if available
+    if (typeof ContactModel.create === "function") {
+      const created = ContactModel.create(req.body);
+      contacts = ContactModel.getContacts
+        ? ContactModel.getContacts()
+        : contacts.concat(created);
 
-    if (!firstName || !lastName || !email || !phone || !birthday) {
-      return res.status(400).json({ error: "Missing required contact fields." });
+      return res.status(201).json(created);
     }
 
-    const maxId = contacts.length > 0
-      ? Math.max(...contacts.map((c) => Number(c.id)))
-      : 0;
+    const { fname, lname, email, phone, birthday } = req.body;
+
+    if (!fname || !lname || !email || !phone || !birthday) {
+      const err = new Error("Missing required contact fields.");
+      err.name = "InvalidContactSchemaError";
+      throw err;
+    }
+
+    const duplicate = contacts.find((c) => c.email === email);
+    if (duplicate) {
+      const err = new Error("A contact with that email already exists.");
+      err.name = "DuplicateContactResourceError";
+      throw err;
+    }
+
+    const maxId = contacts.length ? Math.max(...contacts.map((c) => Number(c.id))) : 0;
 
     const newContact = {
       id: maxId + 1,
-      firstName,
-      lastName,
+      fname,
+      lname,
       email,
       phone,
       birthday
@@ -78,45 +138,61 @@ const createContact = (req, res) => {
 
     return res.status(201).json(newContact);
   } catch (error) {
-    return res.status(500).json({ error: "Failed to create contact." });
+    return handleError(res, error);
   }
 };
 
 const updateContact = (req, res) => {
   try {
     const id = Number(req.params.id);
-    const index = contacts.findIndex((c) => Number(c.id) === id);
 
-    if (index === -1) {
-      return res.status(404).json({ error: "Contact not found." });
+    // Prefer library model update if available
+    if (typeof ContactModel.update === "function") {
+      ContactModel.update(id, req.body);
+    } else {
+      const index = contacts.findIndex((c) => Number(c.id) === id);
+
+      if (index === -1) {
+        const err = new Error(`Contact with id ${id} not found.`);
+        err.name = "ContactNotFoundError";
+        throw err;
+      }
+
+      contacts[index] = {
+        ...contacts[index],
+        ...req.body,
+        id
+      };
     }
 
-    contacts[index] = {
-      ...contacts[index],
-      ...req.body,
-      id
-    };
-
-    return res.status(200).json(contacts[index]);
+    return res.status(303).redirect(`/contacts/${id}`);
   } catch (error) {
-    return res.status(500).json({ error: "Failed to update contact." });
+    return handleError(res, error);
   }
 };
 
 const deleteContact = (req, res) => {
   try {
     const id = Number(req.params.id);
+
+    if (typeof ContactModel.delete === "function") {
+      ContactModel.delete(id);
+      return res.status(204).send();
+    }
+
     const index = contacts.findIndex((c) => Number(c.id) === id);
 
     if (index === -1) {
-      return res.status(404).json({ error: "Contact not found." });
+      const err = new Error(`Contact with id ${id} not found.`);
+      err.name = "ContactNotFoundError";
+      throw err;
     }
 
     contacts.splice(index, 1);
 
     return res.status(204).send();
   } catch (error) {
-    return res.status(500).json({ error: "Failed to delete contact." });
+    return handleError(res, error);
   }
 };
 
