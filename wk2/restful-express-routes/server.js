@@ -7,7 +7,7 @@ const PORT = 8080;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/contacts", contactsRouter);
+app.use("/v1/contacts", contactsRouter);
 
 app.listen(PORT, () => {
   console.log(`Contacts API listening on port ${PORT}`);
