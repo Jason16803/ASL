@@ -5,13 +5,6 @@ const {
   filterContacts
 } = require("@jworkman-fs/asl");
 
-// const getDataset = () => {
-//   if (typeof ContactModel.all === "function") return ContactModel.all();
-//   if (typeof ContactModel.getContacts === "function") return ContactModel.getContacts();
-//   if (Array.isArray(ContactModel.contacts)) return ContactModel.contacts;
-//   return [];
-// };
-
 const getDataset = () => {
   return [...ContactModel.index()];
 };
