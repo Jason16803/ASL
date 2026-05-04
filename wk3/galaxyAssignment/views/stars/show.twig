@@ -1,0 +1,47 @@
+{% extends "layout.twig" %}
+{% block title %}{{ star.name }}{% endblock %}
+{% block content %}
+
+<div class="show-card">
+  {% if star.imageUrl %}
+    <img class="show-img" src="{{ star.imageUrl }}" alt="{{ star.name }}">
+  {% else %}
+    <div class="show-img-placeholder">⭐</div>
+  {% endif %}
+
+  <div class="show-body">
+    <h2>{{ star.name }}</h2>
+    <div class="show-meta">
+      {% if star.size %}Size: {{ star.size }} solar radii{% endif %}
+      {% if star.Galaxy %}
+        · Galaxy: <a href="/galaxies/{{ star.Galaxy.id }}">{{ star.Galaxy.name }}</a>
+      {% endif %}
+    </div>
+
+    {% if star.description %}
+      <p class="show-description">{{ star.description }}</p>
+    {% endif %}
+
+    <div class="show-actions">
+      <a href="/stars/{{ star.id }}/edit" class="btn btn-primary">Edit</a>
+      <form action="/stars/{{ star.id }}/delete" method="POST" style="display:inline"
+            onsubmit="return confirm('Delete {{ star.name }}? This cannot be undone.')">
+        <button type="submit" class="btn btn-danger">Delete</button>
+      </form>
+      <a href="/stars" class="btn btn-secondary">← All Stars</a>
+    </div>
+
+    {% if star.Planets and star.Planets|length > 0 %}
+      <div class="related-section">
+        <h3>🪐 Orbiting Planets ({{ star.Planets|length }})</h3>
+        <div class="tags">
+          {% for planet in star.Planets %}
+            <a href="/planets/{{ planet.id }}" class="tag">{{ planet.name }}</a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

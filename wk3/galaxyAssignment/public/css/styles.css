@@ -1,0 +1,247 @@
+/* ============================================
+   Star Tracker — Space-themed Dark UI
+   ============================================ */
+
+/* Reset & base */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #07071a;
+  color: #dde1f0;
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* ---- Navbar ---- */
+.navbar {
+  background: #0d0d24;
+  border-bottom: 1px solid #1e1e4a;
+  padding: 0.9rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-brand {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #a78bfa;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+
+.nav-links a {
+  color: #8892a4;
+  text-decoration: none;
+  margin-left: 1.6rem;
+  font-size: 0.92rem;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: #c4b5fd; }
+
+/* ---- Container ---- */
+.container {
+  max-width: 980px;
+  margin: 2.2rem auto;
+  padding: 0 1.5rem;
+}
+
+/* ---- Page header ---- */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.8rem;
+}
+.page-header h1 {
+  font-size: 1.75rem;
+  color: #c4b5fd;
+  font-weight: 600;
+}
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-block;
+  padding: 0.48rem 1.1rem;
+  border-radius: 7px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.18s, transform 0.1s;
+  line-height: 1.5;
+}
+.btn:hover  { opacity: 0.82; }
+.btn:active { transform: scale(0.97); }
+
+.btn-primary   { background: #6d28d9; color: #fff; }
+.btn-secondary { background: #1a1a38; color: #94a3b8; border: 1px solid #2d2d5a; }
+.btn-danger    { background: #b91c1c; color: #fff; }
+.btn-sm        { padding: 0.3rem 0.8rem; font-size: 0.8rem; }
+
+/* ---- Card grid ---- */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1.25rem;
+}
+
+.card {
+  background: #0d0d24;
+  border: 1px solid #1a1a40;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card:hover {
+  border-color: #6d28d9;
+  box-shadow: 0 0 16px rgba(109,40,217,0.18);
+}
+
+.card-img {
+  width: 100%;
+  height: 155px;
+  object-fit: cover;
+  display: block;
+}
+.card-img-placeholder {
+  width: 100%;
+  height: 155px;
+  background: #131330;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.2rem;
+}
+
+.card-body    { padding: 1rem 1.1rem; }
+.card-title   { font-size: 1rem; font-weight: 600; color: #e2e8f0; margin-bottom: 0.3rem; }
+.card-text    { font-size: 0.82rem; color: #4a5568; margin-bottom: 0.9rem; }
+.card-actions { display: flex; gap: 0.5rem; }
+
+/* ---- Show page ---- */
+.show-card {
+  background: #0d0d24;
+  border: 1px solid #1a1a40;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.show-img {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  display: block;
+}
+.show-img-placeholder {
+  width: 100%;
+  height: 200px;
+  background: #131330;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 5rem;
+}
+.show-body         { padding: 1.6rem; }
+.show-body h2      { font-size: 1.7rem; color: #c4b5fd; margin-bottom: 0.4rem; }
+.show-meta         { color: #4a5568; font-size: 0.88rem; margin-bottom: 1rem; }
+.show-meta a       { color: #a78bfa; text-decoration: none; }
+.show-meta a:hover { text-decoration: underline; }
+.show-description  { color: #8892a4; line-height: 1.7; margin-bottom: 1.6rem; }
+.show-actions      { display: flex; gap: 0.7rem; flex-wrap: wrap; margin-bottom: 1.6rem; }
+
+/* Related section */
+.related-section       { border-top: 1px solid #1a1a40; padding-top: 1.2rem; }
+.related-section h3    { font-size: 1rem; color: #a78bfa; margin-bottom: 0.8rem; }
+.tags                  { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.tag {
+  background: #131340;
+  color: #a78bfa;
+  padding: 0.28rem 0.7rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  text-decoration: none;
+  border: 1px solid #2a2a6a;
+  transition: background 0.15s;
+}
+.tag:hover { background: #1e1e55; }
+
+/* ---- Forms ---- */
+.form-card {
+  background: #0d0d24;
+  border: 1px solid #1a1a40;
+  border-radius: 12px;
+  padding: 2rem 2.2rem;
+  max-width: 560px;
+}
+
+.form-group            { margin-bottom: 1.2rem; }
+.form-group label      { display: block; font-size: 0.83rem; color: #8892a4; margin-bottom: 0.38rem; font-weight: 500; letter-spacing: 0.02em; }
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  background: #080819;
+  border: 1px solid #252560;
+  border-radius: 7px;
+  color: #dde1f0;
+  font-size: 0.93rem;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus { border-color: #6d28d9; }
+
+.form-group input[type="file"] {
+  color: #8892a4;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.form-group textarea { resize: vertical; min-height: 90px; }
+
+.form-group select option { background: #0d0d24; }
+
+.form-actions { display: flex; gap: 0.8rem; margin-top: 1.6rem; flex-wrap: wrap; }
+
+/* Current image thumbnail in edit forms */
+.current-img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+  border: 1px solid #252560;
+  display: block;
+}
+
+/* ---- Empty state ---- */
+.empty-state       { text-align: center; padding: 3.5rem 1rem; color: #2d3748; }
+.empty-state .icon { font-size: 3.5rem; margin-bottom: 1rem; }
+.empty-state a     { color: #a78bfa; }
+
+/* ---- Error page ---- */
+.error-box         { text-align: center; padding: 4rem 1rem; }
+.error-box .icon   { font-size: 3rem; margin-bottom: 1rem; }
+.error-box h2      { font-size: 1.6rem; color: #f87171; margin-bottom: 0.75rem; }
+.error-box p       { color: #4a5568; margin-bottom: 1.5rem; }
+
+/* ---- Home hero ---- */
+.hero {
+  text-align: center;
+  padding: 5rem 1rem 4rem;
+}
+.hero .hero-icon { font-size: 5.5rem; margin-bottom: 1.2rem; }
+.hero h1         { font-size: 2.6rem; color: #c4b5fd; margin-bottom: 0.8rem; font-weight: 700; }
+.hero p          { color: #4a5568; max-width: 440px; margin: 0 auto 2.2rem; font-size: 1.05rem; }
+.hero-links      { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+.hero-links .btn { padding: 0.65rem 1.4rem; font-size: 0.95rem; }

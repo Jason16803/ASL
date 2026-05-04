@@ -1,0 +1,40 @@
+{% extends "layout.twig" %}
+{% block title %}Galaxies{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1>🌌 Galaxies</h1>
+  <a href="/galaxies/new" class="btn btn-primary">+ New Galaxy</a>
+</div>
+
+{% if galaxies|length == 0 %}
+  <div class="empty-state">
+    <div class="icon">🌌</div>
+    <p>No galaxies cataloged yet. <a href="/galaxies/new">Add the first one.</a></p>
+  </div>
+{% else %}
+  <div class="cards">
+    {% for galaxy in galaxies %}
+    <div class="card">
+      {% if galaxy.imageUrl %}
+        <img class="card-img" src="{{ galaxy.imageUrl }}" alt="{{ galaxy.name }}">
+      {% else %}
+        <div class="card-img-placeholder">🌌</div>
+      {% endif %}
+      <div class="card-body">
+        <div class="card-title">{{ galaxy.name }}</div>
+        <div class="card-text">
+          {% if galaxy.size %}Size: {{ galaxy.size }} ly{% endif %}
+          {% if galaxy.Stars %}· {{ galaxy.Stars|length }} star(s){% endif %}
+        </div>
+        <div class="card-actions">
+          <a href="/galaxies/{{ galaxy.id }}" class="btn btn-secondary btn-sm">View</a>
+          <a href="/galaxies/{{ galaxy.id }}/edit" class="btn btn-secondary btn-sm">Edit</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% endblock %}

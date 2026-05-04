@@ -1,0 +1,44 @@
+{% extends "layout.twig" %}
+{% block title %}{{ galaxy.name }}{% endblock %}
+{% block content %}
+
+<div class="show-card">
+  {% if galaxy.imageUrl %}
+    <img class="show-img" src="{{ galaxy.imageUrl }}" alt="{{ galaxy.name }}">
+  {% else %}
+    <div class="show-img-placeholder">🌌</div>
+  {% endif %}
+
+  <div class="show-body">
+    <h2>{{ galaxy.name }}</h2>
+    <div class="show-meta">
+      {% if galaxy.size %}Size: {{ galaxy.size }} light-years{% endif %}
+    </div>
+
+    {% if galaxy.description %}
+      <p class="show-description">{{ galaxy.description }}</p>
+    {% endif %}
+
+    <div class="show-actions">
+      <a href="/galaxies/{{ galaxy.id }}/edit" class="btn btn-primary">Edit</a>
+      <form action="/galaxies/{{ galaxy.id }}/delete" method="POST" style="display:inline"
+            onsubmit="return confirm('Delete {{ galaxy.name }}? This cannot be undone.')">
+        <button type="submit" class="btn btn-danger">Delete</button>
+      </form>
+      <a href="/galaxies" class="btn btn-secondary">← All Galaxies</a>
+    </div>
+
+    {% if galaxy.Stars and galaxy.Stars|length > 0 %}
+      <div class="related-section">
+        <h3>⭐ Stars ({{ galaxy.Stars|length }})</h3>
+        <div class="tags">
+          {% for star in galaxy.Stars %}
+            <a href="/stars/{{ star.id }}" class="tag">{{ star.name }}</a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

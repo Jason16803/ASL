@@ -1,0 +1,40 @@
+{% extends "layout.twig" %}
+{% block title %}Planets{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1>🪐 Planets</h1>
+  <a href="/planets/new" class="btn btn-primary">+ New Planet</a>
+</div>
+
+{% if planets|length == 0 %}
+  <div class="empty-state">
+    <div class="icon">🪐</div>
+    <p>No planets cataloged yet. <a href="/planets/new">Add the first one.</a></p>
+  </div>
+{% else %}
+  <div class="cards">
+    {% for planet in planets %}
+    <div class="card">
+      {% if planet.imageUrl %}
+        <img class="card-img" src="{{ planet.imageUrl }}" alt="{{ planet.name }}">
+      {% else %}
+        <div class="card-img-placeholder">🪐</div>
+      {% endif %}
+      <div class="card-body">
+        <div class="card-title">{{ planet.name }}</div>
+        <div class="card-text">
+          {% if planet.size %}Size: {{ planet.size }}{% endif %}
+          {% if planet.Stars %}· {{ planet.Stars|length }} star(s){% endif %}
+        </div>
+        <div class="card-actions">
+          <a href="/planets/{{ planet.id }}" class="btn btn-secondary btn-sm">View</a>
+          <a href="/planets/{{ planet.id }}/edit" class="btn btn-secondary btn-sm">Edit</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% endblock %}

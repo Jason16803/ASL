@@ -1,0 +1,41 @@
+{% extends "layout.twig" %}
+{% block title %}Stars{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1>⭐ Stars</h1>
+  <a href="/stars/new" class="btn btn-primary">+ New Star</a>
+</div>
+
+{% if stars|length == 0 %}
+  <div class="empty-state">
+    <div class="icon">⭐</div>
+    <p>No stars cataloged yet. <a href="/stars/new">Add the first one.</a></p>
+  </div>
+{% else %}
+  <div class="cards">
+    {% for star in stars %}
+    <div class="card">
+      {% if star.imageUrl %}
+        <img class="card-img" src="{{ star.imageUrl }}" alt="{{ star.name }}">
+      {% else %}
+        <div class="card-img-placeholder">⭐</div>
+      {% endif %}
+      <div class="card-body">
+        <div class="card-title">{{ star.name }}</div>
+        <div class="card-text">
+          {% if star.size %}Size: {{ star.size }}{% endif %}
+          {% if star.Galaxy %}· {{ star.Galaxy.name }}{% endif %}
+          {% if star.Planets %}· {{ star.Planets|length }} planet(s){% endif %}
+        </div>
+        <div class="card-actions">
+          <a href="/stars/{{ star.id }}" class="btn btn-secondary btn-sm">View</a>
+          <a href="/stars/{{ star.id }}/edit" class="btn btn-secondary btn-sm">Edit</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% endblock %}
